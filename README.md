@@ -4,6 +4,10 @@ A spinning 3D flower bouquet that runs right in your terminal. Daisies, tulips, 
 
 Saw it on TikTok? This is the code.
 
+<p align="center">
+  <img src="screenshot.png" alt="bouquet3d running in a terminal" width="600">
+</p>
+
 ## Run it
 
 You just need Python 3. No packages to install.
