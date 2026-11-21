@@ -501,12 +501,12 @@ class Bouquet {
         ctx.fillStyle = "#0d0d0d";
         ctx.fillRect(0, 0, width, height);
 
-        // Calculate projection parameters
-        const viewRows = height - 40; // leave space for message
-        const scale = Math.max(1.0, Math.min((viewRows - 2) / 1.45, (width - 2) / 2.7));
+        // Calculate projection parameters - use full canvas, center the bouquet
+        const viewRows = height;
+        const scale = Math.max(1.0, Math.min((viewRows - 2) / 1.8, (width - 2) / 3.2));
         const sx_scale = scale * 2.0;
         const cx = width / 2;
-        const cy = 20 + 0.78 * scale; // offset for message area
+        const cy = height / 2; // center vertically
 
         // Current rotation (including user drag)
         const ang = this.rotationY;
@@ -694,9 +694,8 @@ class Bouquet {
             }
         }
 
-        // Draw message
-        const mrow = rows - 2;
-        const my = mrow * this.charHeight;
+        // Draw message at bottom with padding
+        const msgY = height - this.charHeight * 2.5;
         const start = Math.max(0, Math.floor((cols - MESSAGE.length) / 2));
         const shift = Math.floor(this.time * 6);
         for (let i = 0; i < MESSAGE.length; i++) {
@@ -705,18 +704,18 @@ class Bouquet {
                 const ch = MESSAGE[i];
                 const color = MSG_COLORS[(i + shift) % MSG_COLORS.length];
                 ctx.fillStyle = ansiColor(color);
-                ctx.fillText(ch, col * this.charWidth, my);
+                ctx.fillText(ch, col * this.charWidth, msgY);
             }
         }
 
-        // Draw hint
+        // Draw hint below message
         const hint = "Drag to rotate • Wait for auto-spin";
         const hstart = Math.max(0, Math.floor((cols - hint.length) / 2));
         ctx.fillStyle = ansiColor(238);
         for (let i = 0; i < hint.length; i++) {
             const col = hstart + i;
             if (col < cols) {
-                ctx.fillText(hint[i], col * this.charWidth, (rows - 1) * this.charHeight);
+                ctx.fillText(hint[i], col * this.charWidth, height - this.charHeight * 1.2);
             }
         }
     }
