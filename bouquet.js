@@ -354,16 +354,18 @@ class Bouquet {
         this.canvasWidth = rect.width;
         this.canvasHeight = rect.height;
 
-        // Font setup
+        // Font setup - responsive to screen size
         this.charWidth = 0;
         this.charHeight = 0;
         this.measureFont();
     }
 
     measureFont() {
-        this.ctx.font = "10px monospace";
+        // Scale font based on canvas width - smaller screens get smaller chars
+        const baseFontSize = Math.max(8, Math.min(14, this.canvasWidth / 35));
+        this.ctx.font = `${baseFontSize}px monospace`;
         this.charWidth = this.ctx.measureText("A").width;
-        this.charHeight = 12; // approximate line height
+        this.charHeight = baseFontSize * 1.2; // line height
     }
 
     setupEvents() {
@@ -372,7 +374,7 @@ class Bouquet {
         window.addEventListener("mousemove", (e) => this.onDragMove(e.clientX, e.clientY));
         window.addEventListener("mouseup", () => this.onDragEnd());
 
-        // Touch events
+        // Touch events - handle properly for mobile
         this.canvas.addEventListener("touchstart", (e) => {
             if (e.touches.length === 1) {
                 this.onDragStart(e.touches[0].clientX, e.touches[0].clientY);
@@ -385,14 +387,27 @@ class Bouquet {
                 e.preventDefault();
             }
         }, { passive: false });
-        this.canvas.addEventListener("touchend", () => this.onDragEnd());
+        this.canvas.addEventListener("touchend", (e) => {
+            this.onDragEnd();
+            e.preventDefault();
+        }, { passive: false });
+        this.canvas.addEventListener("touchcancel", () => this.onDragEnd());
 
-        // Resize
-        window.addEventListener("resize", () => this.setupCanvas());
+        // Resize - use debounce for performance
+        let resizeTimeout;
+        window.addEventListener("resize", () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => this.setupCanvas(), 100);
+        });
+
+        // Also handle orientation change
+        window.addEventListener("orientationchange", () => {
+            setTimeout(() => this.setupCanvas(), 200);
+        });
 
         // Stop auto-spin on interaction
         this.canvas.addEventListener("mousemove", () => { this.autoSpin = false; });
-        this.canvas.addEventListener("touchstart", () => { this.autoSpin = false; });
+        this.canvas.addEventListener("touchstart", () => { this.autoSpin = false; }, { passive: true });
 
         // Resume auto-spin after inactivity
         let inactivityTimer;
@@ -401,7 +416,7 @@ class Bouquet {
             inactivityTimer = setTimeout(() => { this.autoSpin = true; }, 3000);
         };
         this.canvas.addEventListener("mousemove", resetInactivity);
-        this.canvas.addEventListener("touchmove", resetInactivity);
+        this.canvas.addEventListener("touchmove", resetInactivity, { passive: true });
     }
 
     onDragStart(x, y) {

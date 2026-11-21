@@ -1,0 +1,11 @@
+{
+  "name": "ASCII Flower Bouquet",
+  "short_name": "Flower Bouquet",
+  "description": "An interactive 3D ASCII flower bouquet - drag to rotate",
+  "start_url": "/",
+  "display": "fullscreen",
+  "background_color": "#0d0d0d",
+  "theme_color": "#0d0d0d",
+  "orientation": "portrait-primary",
+  "icons": []
+}
